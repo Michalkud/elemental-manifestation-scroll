@@ -435,6 +435,7 @@
                 min-height: 100vh;
                 height: 100vh;
                 overflow: hidden;
+                padding: 10px; /* Add small padding to section */
             }
 
             .nav-dots {
@@ -444,63 +445,77 @@
             /* Nav dots hidden on mobile, no need for mobile-specific styles */
 
             .section-content {
-                padding: 30px 20px;
-                margin: 15px;
-                backdrop-filter: blur(2px); /* Reduced blur */
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Lighter shadow */
-                max-height: 90vh;
+                padding: 20px 15px; /* Reduced from 30px 20px */
+                margin: 0; /* Removed margin for full width */
+                width: calc(100% - 20px); /* Full width minus small margin */
+                backdrop-filter: none; /* Removed blur for performance */
+                background: rgba(0, 0, 0, 0.75); /* Darker background for contrast */
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Lighter shadow */
+                max-height: calc(100vh - 40px); /* Increased from 90vh */
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
+                border-radius: 12px; /* Reduced from 20px */
             }
 
             .slide-number {
-                font-size: 16px;
-                margin-bottom: 15px;
+                font-size: 18px; /* Increased from 16px */
+                margin-bottom: 10px; /* Reduced from 15px */
+                opacity: 0.7;
             }
 
             h1 {
-                font-size: clamp(2rem, 6vw, 3rem); /* Smaller on mobile */
-                margin-bottom: 15px;
+                font-size: clamp(2.5rem, 8vw, 3.5rem); /* Increased minimum from 2rem */
+                margin-bottom: 12px; /* Reduced from 15px */
+                line-height: 1.1;
             }
 
             .subtitle {
-                font-size: clamp(1rem, 3vw, 1.4rem);
-                margin-bottom: 20px;
+                font-size: clamp(1.2rem, 4vw, 1.6rem); /* Increased from 1rem */
+                margin-bottom: 15px; /* Reduced from 20px */
+                opacity: 0.95;
             }
 
             .description {
-                font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+                font-size: clamp(1rem, 3vw, 1.2rem); /* Increased from 0.9rem */
                 text-align: left;
-                line-height: 1.6;
-                margin-bottom: 20px;
+                line-height: 1.7; /* Increased from 1.6 */
+                margin-bottom: 15px; /* Reduced from 20px */
             }
 
             .principles {
-                margin-top: 20px;
+                margin-top: 15px; /* Reduced from 20px */
             }
 
             .principles li {
-                font-size: clamp(0.85rem, 2vw, 1rem);
-                margin-bottom: 12px;
+                font-size: clamp(0.95rem, 2.5vw, 1.1rem); /* Increased from 0.85rem */
+                margin-bottom: 10px; /* Reduced from 12px */
                 padding-left: 25px;
+                line-height: 1.6;
             }
 
             .principles li::before {
-                font-size: 14px;
+                font-size: 16px; /* Increased from 14px */
+            }
+
+            /* Title section specific adjustments */
+            #section-title .section-content {
+                padding: 25px 20px; /* Slightly more padding for title */
             }
 
             .title-heading {
-                font-size: clamp(2.5rem, 7vw, 3.5rem);
-                margin-bottom: 30px;
-                letter-spacing: 3px;
+                font-size: clamp(3rem, 9vw, 4rem); /* Increased from 2.5rem */
+                margin-bottom: 25px; /* Reduced from 30px */
+                letter-spacing: 2px; /* Reduced from 3px */
+                line-height: 1.1;
             }
 
             .magician-rule {
-                font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+                font-size: clamp(1.3rem, 4vw, 1.9rem); /* Increased from 1.2rem */
+                line-height: 1.5;
             }
 
             .rule-emphasis {
-                font-size: clamp(1rem, 3vw, 1.4rem);
+                font-size: clamp(1.1rem, 3.5vw, 1.5rem); /* Increased from 1rem */
                 margin-top: 10px;
             }
 
@@ -517,13 +532,14 @@
             }
 
             .scroll-indicator {
-                bottom: 20px;
+                bottom: 15px; /* Closer to bottom for more content space */
+                opacity: 0.7; /* Slightly transparent to not obstruct content */
             }
 
             .scroll-arrow {
-                width: 25px;
-                height: 25px;
-                border-width: 2px;
+                width: 20px; /* Smaller arrow */
+                height: 20px;
+                border-width: 1.5px; /* Thinner border */
             }
 
             /* Reduced animations on mobile */
@@ -542,30 +558,77 @@
 
         /* Touch-friendly adjustments for small screens */
         @media (max-width: 480px) {
+            .section {
+                padding: 5px; /* Even less padding on very small screens */
+            }
+
             .section-content {
-                padding: 25px 15px;
-                margin: 10px;
-                border-radius: 15px;
+                padding: 18px 12px; /* Compact padding */
+                margin: 0;
+                width: calc(100% - 10px);
+                border-radius: 10px;
+                max-height: calc(100vh - 30px); /* More vertical space */
+            }
+
+            .slide-number {
+                font-size: 16px;
+                margin-bottom: 8px;
             }
 
             h1 {
-                font-size: 1.8rem;
+                font-size: 2.2rem; /* Increased from 1.8rem */
+                margin-bottom: 10px;
             }
 
             .title-heading {
-                font-size: 2.2rem;
+                font-size: 2.8rem; /* Increased from 2.2rem */
+                margin-bottom: 20px;
             }
 
             .subtitle {
-                font-size: 1rem;
+                font-size: 1.15rem; /* Increased from 1rem */
+                margin-bottom: 12px;
             }
 
             .description {
-                font-size: 0.9rem;
+                font-size: 1rem; /* Increased from 0.9rem */
+                line-height: 1.65;
+                margin-bottom: 12px;
+            }
+
+            .principles {
+                margin-top: 12px;
             }
 
             .principles li {
-                font-size: 0.85rem;
+                font-size: 0.95rem; /* Increased from 0.85rem */
+                margin-bottom: 8px;
+                padding-left: 22px;
+            }
+
+            .principles li::before {
+                font-size: 14px;
+            }
+
+            .magician-rule {
+                font-size: 1.2rem;
+                line-height: 1.4;
+            }
+
+            .rule-emphasis {
+                font-size: 1rem;
+                margin-top: 8px;
+            }
+
+            /* Even more compact language toggle */
+            .language-toggle {
+                top: 10px;
+                right: 10px;
+                padding: 8px 12px;
+            }
+
+            .language-toggle span {
+                font-size: 11px;
             }
         }
 
@@ -784,9 +847,9 @@
         
         // Performance config based on device
         const config = {
-            particleCount: isMobile ? 30 : 150,
-            particleSpeed: isMobile ? 0.3 : 0.8,
-            shadowBlur: isMobile ? 15 : 30,
+            particleCount: isMobile ? 20 : 150, // Reduced from 30 to 20 for mobile
+            particleSpeed: isMobile ? 0.2 : 0.8, // Slower particles on mobile
+            shadowBlur: isMobile ? 10 : 30, // Less blur for better performance
             animationQuality: isMobile || isLowPerformance ? 'low' : 'high',
             enableComplexShapes: !isMobile && !isLowPerformance,
             fps: isMobile ? 30 : 60
