@@ -902,15 +902,16 @@
             getColorForSection() {
                 const section = Math.floor(window.scrollY / window.innerHeight);
                 const colors = [
-                    { r: 75, g: 0, b: 130 },      // Spirit violet
-                    { r: 255, g: 215, b: 0 },      // Gold
-                    { r: 220, g: 20, b: 60 },      // Fire red
-                    { r: 255, g: 255, b: 0 },      // Air yellow
-                    { r: 255, g: 215, b: 0 },      // Balance gold
-                    { r: 0, g: 0, b: 255 },        // Water blue
-                    { r: 255, g: 255, b: 255 },    // Mixed white
-                    { r: 128, g: 70, b: 27 },      // Earth brown
-                    { r: 147, g: 0, b: 211 }       // Rainbow violet
+                    { r: 255, g: 215, b: 0 },      // 0. Title - Gold/mixed (Magician)
+                    { r: 147, g: 0, b: 211 },      // 1. Infinity - Violet (∞ symbol)
+                    { r: 255, g: 215, b: 0 },      // 2. Sense of Self - Gold (☉ sun symbol)
+                    { r: 220, g: 20, b: 60 },      // 3. Desire - Fire red (△ fire triangle)
+                    { r: 255, g: 255, b: 0 },      // 4. Imagination - Air yellow (△ air triangle)
+                    { r: 0, g: 0, b: 255 },        // 5. The Feeling - Water blue (▽ water triangle)
+                    { r: 255, g: 215, b: 0 },      // 6. Soul-Alignment - Gold (✡ hexagram)
+                    { r: 255, g: 255, b: 255 },    // 7. Trials - White (⭐ star)
+                    { r: 128, g: 70, b: 27 },      // 8. Embodiment - Earth brown (◆ diamond)
+                    { r: 147, g: 0, b: 211 }       // 9. New Start - Violet/rainbow (∞ infinity)
                 ];
                 return colors[Math.min(section, colors.length - 1)];
             }
