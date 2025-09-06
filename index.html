@@ -1006,7 +1006,7 @@
                 ctx.shadowColor = 'rgba(255, 107, 53, 1)';
                 
                 // Fire gradient
-                const gradient = ctx.createRadialGradient(0, -size/2, 0, 0, size/2, size);
+                const gradient = ctx.createRadialGradient(0, -size/3, 0, 0, size/3, size * 0.8);
                 gradient.addColorStop(0, 'rgba(255, 255, 0, 0.9)');
                 gradient.addColorStop(0.3, 'rgba(255, 140, 0, 0.9)');
                 gradient.addColorStop(0.6, 'rgba(255, 69, 0, 0.9)');
@@ -1015,21 +1015,22 @@
                 ctx.strokeStyle = gradient;
                 ctx.lineWidth = 4;
                 
-                // Draw upward-pointing triangle (Fire)
+                // Draw upward-pointing triangle (Fire) - adjusted to prevent cutoff
+                // Reduced height from 0.6 to 0.5 and shifted down slightly
                 ctx.beginPath();
-                ctx.moveTo(0, -size * 0.6);
-                ctx.lineTo(-size * 0.52, size * 0.3);
-                ctx.lineTo(size * 0.52, size * 0.3);
+                ctx.moveTo(0, -size * 0.5);  // Top peak (was 0.6)
+                ctx.lineTo(-size * 0.433, size * 0.25);  // Bottom left (adjusted proportionally)
+                ctx.lineTo(size * 0.433, size * 0.25);   // Bottom right (adjusted proportionally)
                 ctx.closePath();
                 ctx.stroke();
                 
-                // Inner glow
+                // Inner glow - also adjusted proportionally
                 ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(0, -size * 0.4);
-                ctx.lineTo(-size * 0.35, size * 0.2);
-                ctx.lineTo(size * 0.35, size * 0.2);
+                ctx.moveTo(0, -size * 0.35);  // Was 0.4
+                ctx.lineTo(-size * 0.3, size * 0.17);  // Was 0.35, 0.2
+                ctx.lineTo(size * 0.3, size * 0.17);   // Was 0.35, 0.2
                 ctx.closePath();
                 ctx.stroke();
                 
@@ -1466,8 +1467,8 @@
                         ctx.restore();
                         break;
                     case 3:
-                        // Fire triangle for Desire
-                        this.drawFireTriangle(centerX, centerY, 180 * sizeMultiplier);
+                        // Fire triangle for Desire - reduced size on mobile to prevent cutoff
+                        this.drawFireTriangle(centerX, centerY, (isMobile ? 150 : 180) * sizeMultiplier);
                         break;
                     case 4:
                         // Air triangle for Imagination  
