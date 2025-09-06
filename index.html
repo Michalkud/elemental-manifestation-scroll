@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pageTitle">Elemental Manifestation - Sacred Journey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-void: #000005;
+            --text-light: #e8e3d3;
+            --text-dim: #a09a8c;
+            --gold: #ffd700;
+            --spirit-violet: #4b0082;
+            --fire-red: #dc143c;
+            --water-blue: #0000ff;
+            --air-yellow: #ffff00;
+            --earth-brown: #80461b;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch; /* Momentum scrolling on iOS */
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: var(--bg-void);
+            color: var(--text-light);
+            overflow-x: hidden;
+            position: relative;
+            overscroll-behavior-y: none; /* Prevent pull-to-refresh */
+        }
+
+        /* Background Canvas */
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 1;
+            filter: contrast(1.2) brightness(1.1);
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nav-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-dot.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            box-shadow: 0 0 20px var(--gold);
+        }
+
+        .nav-dot:hover {
+            border-color: rgba(255, 255, 255, 0.7);
+            transform: scale(1.2);
+        }
+
+        .nav-dot::after {
+            content: attr(data-title);
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--text-light);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-dot:hover::after {
+            opacity: 1;
+        }
+
+        /* Sections */
+        .section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            scroll-snap-align: start;
+            scroll-snap-stop: always; /* Force stop at each section */
+            z-index: 2;
+        }
+
+        .section-content {
+            max-width: 800px;
+            padding: 60px 40px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .section.active .section-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Instagram-like mobile transitions */
+        @media (max-width: 768px) {
+            .section-content {
+                transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+        }
+
+        .slide-number {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            font-style: italic;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .description {
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        .principles {
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+        }
+
+        .principles li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+            text-align: left;
+            font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+            line-height: 1.6;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: fadeInSlide 0.8s ease forwards;
+        }
+
+        .section.active .principles li:nth-child(1) { animation-delay: 0.3s; }
+        .section.active .principles li:nth-child(2) { animation-delay: 0.5s; }
+        .section.active .principles li:nth-child(3) { animation-delay: 0.7s; }
+
+        .principles li::before {
+            position: absolute;
+            left: 0;
+            font-size: 18px;
+        }
+
+        /* Section-specific colors */
+        #section-0 h1 { 
+            background: linear-gradient(135deg, #c0c0c0, var(--spirit-violet), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-0 .principles li::before { content: '∞'; color: var(--spirit-violet); }
+
+        #section-05 h1 {
+            background: linear-gradient(135deg, var(--gold), #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-05 .principles li::before { content: '☉'; color: var(--gold); }
+
+        #section-1 h1 {
+            background: linear-gradient(135deg, #ffb347, #ff6b35, #ff2400, var(--fire-red));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-1 .principles li::before { content: '△'; color: var(--fire-red); }
+
+        #section-2 h1 {
+            background: linear-gradient(135deg, var(--air-yellow), #8b008b, var(--air-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-2 .principles li::before { content: '△'; color: var(--air-yellow); }
+
+        #section-3 h1 {
+            background: linear-gradient(135deg, #ff1493, #00fa9a, var(--gold), #9400d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-3 .principles li::before { content: '✡'; color: var(--gold); }
+
+        #section-4 h1 {
+            background: linear-gradient(135deg, #4682b4, var(--water-blue), #2e8b57, #c0c0c0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-4 .principles li::before { content: '▽'; color: var(--water-blue); }
+
+        #section-5 h1 {
+            background: linear-gradient(135deg, var(--fire-red), var(--water-blue), var(--air-yellow), var(--earth-brown), var(--spirit-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-5 .principles li::before { content: '⭐'; color: #fff; }
+
+        #section-6 h1 {
+            background: linear-gradient(135deg, #000, var(--earth-brown), #808000, #e4d00a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-6 .principles li::before { content: '◆'; color: var(--earth-brown); }
+
+        #section-7 h1 {
+            background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            background-size: 200% 200%;
+            animation: rainbowShift 5s ease infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-7 .principles li::before { content: '∞'; 
+            background: linear-gradient(90deg, #9400d3, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Title Section Specific Styles */
+        #section-title .title-content {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            max-width: 900px;
+        }
+
+        .rule-number {
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            color: var(--gold);
+            opacity: 0.7;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+        }
+
+        .title-heading {
+            font-size: clamp(3rem, 6vw, 5rem);
+            background: linear-gradient(135deg, var(--gold), #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+
+        .magician-rule {
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            line-height: 1.6;
+            color: var(--text-light);
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .rule-emphasis {
+            display: block;
+            margin-top: 15px;
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            font-style: italic;
+            opacity: 0.9;
+            background: linear-gradient(90deg, var(--spirit-violet), var(--gold), var(--spirit-violet));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Animations */
+        @keyframes fadeInSlide {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes rainbowShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes collapseParticles {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Scroll Indicator */
+        .scroll-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .scroll-indicator.hidden {
+            opacity: 0;
+        }
+
+        .scroll-arrow {
+            width: 30px;
+            height: 30px;
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            transform: rotate(45deg);
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) rotate(45deg); }
+            40% { transform: translateY(-10px) rotate(45deg); }
+            60% { transform: translateY(-5px) rotate(45deg); }
+        }
+
+        /* Language Toggle Button */
+        .language-toggle {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 1001;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            border-radius: 30px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .language-toggle:hover {
+            background: rgba(0, 0, 0, 0.9);
+            border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .language-toggle span {
+            font-family: 'Cinzel', serif;
+            font-size: 14px;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            /* Instagram-like scrolling on mobile */
+            html {
+                scroll-snap-type: y mandatory;
+                scroll-padding: 0;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: none;
+            }
+
+            body {
+                overscroll-behavior: none;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                user-select: none;
+            }
+
+            .section {
+                scroll-snap-align: center;
+                scroll-snap-stop: always;
+                min-height: 100vh;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .nav-dots {
+                display: none; /* Hide navigation dots on mobile */
+            }
+
+            /* Nav dots hidden on mobile, no need for mobile-specific styles */
+
+            .section-content {
+                padding: 30px 20px;
+                margin: 15px;
+                backdrop-filter: blur(2px); /* Reduced blur */
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Lighter shadow */
+                max-height: 90vh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .slide-number {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            h1 {
+                font-size: clamp(2rem, 6vw, 3rem); /* Smaller on mobile */
+                margin-bottom: 15px;
+            }
+
+            .subtitle {
+                font-size: clamp(1rem, 3vw, 1.4rem);
+                margin-bottom: 20px;
+            }
+
+            .description {
+                font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+                text-align: left;
+                line-height: 1.6;
+                margin-bottom: 20px;
+            }
+
+            .principles {
+                margin-top: 20px;
+            }
+
+            .principles li {
+                font-size: clamp(0.85rem, 2vw, 1rem);
+                margin-bottom: 12px;
+                padding-left: 25px;
+            }
+
+            .principles li::before {
+                font-size: 14px;
+            }
+
+            .title-heading {
+                font-size: clamp(2.5rem, 7vw, 3.5rem);
+                margin-bottom: 30px;
+                letter-spacing: 3px;
+            }
+
+            .magician-rule {
+                font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+            }
+
+            .rule-emphasis {
+                font-size: clamp(1rem, 3vw, 1.4rem);
+                margin-top: 10px;
+            }
+
+            .language-toggle {
+                top: 15px;
+                right: 15px;
+                padding: 10px 15px;
+                border-radius: 25px;
+            }
+
+            .language-toggle span {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
+
+            .scroll-indicator {
+                bottom: 20px;
+            }
+
+            .scroll-arrow {
+                width: 25px;
+                height: 25px;
+                border-width: 2px;
+            }
+
+            /* Reduced animations on mobile */
+            @keyframes fadeInSlide {
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0) rotate(45deg); }
+                50% { transform: translateY(-5px) rotate(45deg); }
+            }
+        }
+
+        /* Touch-friendly adjustments for small screens */
+        @media (max-width: 480px) {
+            .section-content {
+                padding: 25px 15px;
+                margin: 10px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .title-heading {
+                font-size: 2.2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .description {
+                font-size: 0.9rem;
+            }
+
+            .principles li {
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+                scroll-behavior: auto !important;
+            }
+
+            #bgCanvas {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle Button -->
+    <div class="language-toggle" onclick="toggleLanguage()">
+        <span id="langButton">EN</span>
+    </div>
+
+    <!-- Background Canvas -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Navigation Dots -->
+    <div class="nav-dots">
+        <div class="nav-dot active" data-title="The Magician" data-title-cz="Mág" data-section="0"></div>
+        <div class="nav-dot" data-title="Infinity" data-title-cz="Nekonečno" data-section="1"></div>
+        <div class="nav-dot" data-title="Sense of Self" data-title-cz="Smysl Já" data-section="2"></div>
+        <div class="nav-dot" data-title="Desire" data-title-cz="Touha" data-section="3"></div>
+        <div class="nav-dot" data-title="Imagination" data-title-cz="Představivost" data-section="4"></div>
+        <div class="nav-dot" data-title="Soul-Alignment" data-title-cz="Soulad Duše" data-section="5"></div>
+        <div class="nav-dot" data-title="Feeling" data-title-cz="Pocit" data-section="6"></div>
+        <div class="nav-dot" data-title="Trials" data-title-cz="Zkoušky" data-section="7"></div>
+        <div class="nav-dot" data-title="Embodiment" data-title-cz="Ztělesnění" data-section="8"></div>
+        <div class="nav-dot" data-title="New Start" data-title-cz="Nový Začátek" data-section="9"></div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-arrow"></div>
+    </div>
+
+    <!-- Title Section: The Magician -->
+    <section id="section-title" class="section active">
+        <div class="section-content title-content">
+            <h1 class="title-heading" data-i18n="titleHeading">How to live your dream</h1>
+            <p class="magician-rule">
+                <span data-i18n="willDirects">Will directs energy</span><br>
+                <span class="rule-emphasis" data-i18n="focusedAttention">your focused attention collapses infinite possibilities into one reality</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- Section 0: Infinity -->
+    <section id="section-0" class="section">
+        <div class="section-content">
+            <div class="slide-number">0.</div>
+            <h1 data-i18n="section0Title">Infinity</h1>
+            <p class="subtitle" data-i18n="section0Subtitle">The space of all variants</p>
+            <p class="description" data-i18n="section0Description">
+                At the beginning there is space. Infinity. A place where everything exists simultaneously—all variants of how reality could look already exist. Absolute potential without a center, an endless field of possibilities waiting to be chosen.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section0Principle1">All possibilities coexist in the quantum field of pure potential</li>
+                <li data-i18n="section0Principle2">Every timeline, every outcome, every dream already exists here</li>
+                <li data-i18n="section0Principle3">In infinity, there is no center—only endless expansion</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 0.5: Sense of Self -->
+    <section id="section-05" class="section">
+        <div class="section-content">
+            <div class="slide-number">0.5</div>
+            <h1 data-i18n="section05Title">Sense of Self</h1>
+            <p class="subtitle" data-i18n="section05Subtitle">The Monad Awakens</p>
+            <p class="description" data-i18n="section05Description">
+                In the vast infinity, a point of consciousness emerges—the Monad. The first movement from endless potential into self-awareness. This is you, recognizing yourself as a unique perspective within the infinite field of possibilities.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section05Principle1">The Monad is the first principle—undivided consciousness</li>
+                <li data-i18n="section05Principle2">From infinite possibilities, awareness chooses to be</li>
+                <li data-i18n="section05Principle3">The center that creates all circles begins here</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 1: Desire -->
+    <section id="section-1" class="section">
+        <div class="section-content">
+            <div class="slide-number">1.</div>
+            <h1 data-i18n="section1Title">Desire</h1>
+            <p class="subtitle" data-i18n="section1Subtitle">The Spark</p>
+            <p class="description" data-i18n="section1Description">
+                First, there's a deep sense, a deep desire. It's simple: "I want." You don't even have to know what you want or how to achieve it. Just that spark: "I deeply desire something." This ignites the fire element, the creative force that transforms potential into direction.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section1Principle1">Desire is the fire that ignites manifestation</li>
+                <li data-i18n="section1Principle2">The pentagram channels will through five sacred points</li>
+                <li data-i18n="section1Principle3">From the spark comes the flame of creation</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 2: Imagination -->
+    <section id="section-2" class="section">
+        <div class="section-content">
+            <div class="slide-number">2.</div>
+            <h1 data-i18n="section2Title">Imagination</h1>
+            <p class="subtitle" data-i18n="section2Subtitle">Creating the Vision</p>
+            <p class="description" data-i18n="section2Description">
+                Then imagination comes; that burning desire pushes you to imagine. You're starting to see your goal, shaping it with the air element of mind. The hexagram forms—as above in imagination, so below in reality. Vision crystallizes from formless desire.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section2Principle1">Imagination gives form to formless desire</li>
+                <li data-i18n="section2Principle2">The hexagram unites heaven and earth through vision</li>
+                <li data-i18n="section2Principle3">Air carries thoughts into the realm of possibility</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 3: Soul-Alignment -->
+    <section id="section-3" class="section">
+        <div class="section-content">
+            <div class="slide-number">3.</div>
+            <h1 data-i18n="section3Title">Soul-Alignment</h1>
+            <p class="subtitle" data-i18n="section3Subtitle">Ethics of Intention</p>
+            <p class="description" data-i18n="section3Description">
+                Your imagination should always be in harmony with your soul, otherwise you'll reach a desire that wasn't truly yours. When imagining, we should always think only of fulfillment that harms no one. This isn't a command to the universe; you can call in bad things too, but you'll always pay for it.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section3Principle1">True desires resonate with the soul's authentic frequency</li>
+                <li data-i18n="section3Principle2">Ethical intention creates harmony in manifestation</li>
+                <li data-i18n="section3Principle3">What harms none flows freely through creation</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 4: Feeling -->
+    <section id="section-4" class="section">
+        <div class="section-content">
+            <div class="slide-number">4.</div>
+            <h1 data-i18n="section4Title">The Feeling</h1>
+            <p class="subtitle" data-i18n="section4Subtitle">"It Already Happened"</p>
+            <p class="description" data-i18n="section4Description">
+                You must be guided by feeling; when you imagine your goal, feel as if you have already achieved it, even in everyday life. Keep operating in that feeling and tune your actions to it. Like water finding its level, the feeling settles into perfect stillness of accomplishment.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section4Principle1">Feel the completion before the form appears</li>
+                <li data-i18n="section4Principle2">Water always finds its true level—let feeling flow naturally</li>
+                <li data-i18n="section4Principle3">Live from the end, not toward it</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 5: Trials -->
+    <section id="section-5" class="section">
+        <div class="section-content">
+            <div class="slide-number">5.</div>
+            <h1 data-i18n="section5Title">Trials</h1>
+            <p class="subtitle" data-i18n="section5Subtitle">The Waves</p>
+            <p class="description" data-i18n="section5Description">
+                Trust that what feels like falling apart is actually falling into place. Keep that feeling within; don't fight what you see, but don't resist either. Let yourself be carried by the wave. The storm tests your commitment, but the center remains calm.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section5Principle1">Trials are the universe testing your readiness</li>
+                <li data-i18n="section5Principle2">In the eye of the storm, find your stillness</li>
+                <li data-i18n="section5Principle3">The phoenix rises through the flames of challenge</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 6: Embodiment -->
+    <section id="section-6" class="section">
+        <div class="section-content">
+            <div class="slide-number">6.</div>
+            <h1 data-i18n="section6Title">Embodiment</h1>
+            <p class="subtitle" data-i18n="section6Subtitle">The Kingdom Opens</p>
+            <p class="description" data-i18n="section6Description">
+                If you persist, the heavenly kingdom materializes, and those who didn't believe in you begin to admire you; you become the master of your reality. Inner state prints outward—the crown manifests, the throne appears, and reality responds to your sovereign presence.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section6Principle1">The inner kingdom manifests as outer sovereignty</li>
+                <li data-i18n="section6Principle2">Reality reorganizes itself around your embodied truth</li>
+                <li data-i18n="section6Principle3">Earth receives and grounds all that descends from above</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 7: New Start -->
+    <section id="section-7" class="section">
+        <div class="section-content">
+            <div class="slide-number">7.</div>
+            <h1 data-i18n="section7Title">The New Start</h1>
+            <p class="subtitle" data-i18n="section7Subtitle">Higher Resolution Reality</p>
+            <p class="description" data-i18n="section7Description">
+                Reality crystallizes through new lenses of perception. Each layer becomes transparent, each pattern reveals its purpose. The journey begins anew from an elevated octave—what was once hidden now shimmers in pristine clarity. You see with the eyes that have witnessed transformation.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section7Principle1">Perception upgraded to crystalline clarity</li>
+                <li data-i18n="section7Principle2">The spiral returns to origin at a higher level</li>
+                <li data-i18n="section7Principle3">Integration births new possibilities</li>
+            </ul>
+        </div>
+    </section>
+
+    <script>
+        // Mobile detection and performance monitoring
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+        const isLowPerformance = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4;
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        
+        // Performance config based on device
+        const config = {
+            particleCount: isMobile ? 30 : 150,
+            particleSpeed: isMobile ? 0.3 : 0.8,
+            shadowBlur: isMobile ? 15 : 30,
+            animationQuality: isMobile || isLowPerformance ? 'low' : 'high',
+            enableComplexShapes: !isMobile && !isLowPerformance,
+            fps: isMobile ? 30 : 60
+        };
+
+        // Canvas setup with DPR support
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d', { alpha: false }); // Better performance
+        const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2); // Limit DPR on mobile
+
+        function resizeCanvas() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
+            
+            ctx.scale(dpr, dpr);
+        }
+        resizeCanvas();
+        
+        // Debounced resize for better performance
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(resizeCanvas, 250);
+        });
+
+        // Particle system
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                const canvasWidth = canvas.width / dpr;
+                const canvasHeight = canvas.height / dpr;
+                this.x = Math.random() * canvasWidth;
+                this.y = Math.random() * canvasHeight;
+                this.size = isMobile ? (Math.random() * 2 + 0.5) : (Math.random() * 3 + 1);
+                this.speedX = (Math.random() - 0.5) * config.particleSpeed;
+                this.speedY = (Math.random() - 0.5) * config.particleSpeed;
+                this.opacity = Math.random() * (isMobile ? 0.5 : 0.7) + 0.3;
+                this.fadeSpeed = Math.random() * (isMobile ? 0.005 : 0.008) + 0.003;
+                this.color = this.getColorForSection();
+            }
+
+            getColorForSection() {
+                const section = Math.floor(window.scrollY / window.innerHeight);
+                const colors = [
+                    { r: 75, g: 0, b: 130 },      // Spirit violet
+                    { r: 255, g: 215, b: 0 },      // Gold
+                    { r: 220, g: 20, b: 60 },      // Fire red
+                    { r: 255, g: 255, b: 0 },      // Air yellow
+                    { r: 255, g: 215, b: 0 },      // Balance gold
+                    { r: 0, g: 0, b: 255 },        // Water blue
+                    { r: 255, g: 255, b: 255 },    // Mixed white
+                    { r: 128, g: 70, b: 27 },      // Earth brown
+                    { r: 147, g: 0, b: 211 }       // Rainbow violet
+                ];
+                return colors[Math.min(section, colors.length - 1)];
+            }
+
+            update() {
+                const canvasWidth = canvas.width / dpr;
+                const canvasHeight = canvas.height / dpr;
+                
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Wrap around edges
+                if (this.x < 0) this.x = canvasWidth;
+                if (this.x > canvasWidth) this.x = 0;
+                if (this.y < 0) this.y = canvasHeight;
+                if (this.y > canvasHeight) this.y = 0;
+
+                // Fade in and out
+                this.opacity += this.fadeSpeed;
+                const maxOpacity = isMobile ? 0.7 : 0.9;
+                if (this.opacity > maxOpacity || this.opacity < 0.2) {
+                    this.fadeSpeed = -this.fadeSpeed;
+                }
+            }
+
+            draw() {
+                const color = this.getColorForSection();
+                ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Sacred geometry shapes
+        class SacredGeometry {
+            constructor() {
+                this.rotation = 0;
+                this.scale = 1;
+                this.pulsePhase = 0;
+                this.trialsStateTimer = 0;
+            }
+
+            update() {
+                this.rotation += 0.002;
+                this.pulsePhase += 0.01;
+                this.scale = 1 + Math.sin(this.pulsePhase) * 0.1;
+                this.trialsStateTimer += 0.01;
+            }
+
+            drawInfinity(x, y, size) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(this.rotation);
+                ctx.scale(this.scale, this.scale);
+                
+                // Reduced glow effect for mobile
+                ctx.shadowBlur = config.shadowBlur;
+                ctx.shadowColor = 'rgba(147, 0, 211, 0.8)';
+                
+                // Draw with gradient
+                const gradient = ctx.createLinearGradient(-size, 0, size, 0);
+                gradient.addColorStop(0, 'rgba(192, 192, 192, 0.9)');
+                gradient.addColorStop(0.5, 'rgba(147, 0, 211, 0.9)');
+                gradient.addColorStop(1, 'rgba(255, 215, 0, 0.9)');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                
+                for (let t = 0; t <= Math.PI * 2; t += 0.01) {
+                    const px = size * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+                    const py = size * Math.sin(t) * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+                    
+                    if (t === 0) {
+                        ctx.moveTo(px, py);
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            drawFireTriangle(x, y, size) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(this.rotation);
+                ctx.scale(this.scale, this.scale);
+                
+                // Reduced fire glow for mobile
+                ctx.shadowBlur = isMobile ? 20 : 50;
+                ctx.shadowColor = 'rgba(255, 107, 53, 1)';
+                
+                // Fire gradient
+                const gradient = ctx.createRadialGradient(0, -size/2, 0, 0, size/2, size);
+                gradient.addColorStop(0, 'rgba(255, 255, 0, 0.9)');
+                gradient.addColorStop(0.3, 'rgba(255, 140, 0, 0.9)');
+                gradient.addColorStop(0.6, 'rgba(255, 69, 0, 0.9)');
+                gradient.addColorStop(1, 'rgba(220, 20, 60, 0.9)');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 4;
+                
+                // Draw upward-pointing triangle (Fire)
+                ctx.beginPath();
+                ctx.moveTo(0, -size * 0.6);
+                ctx.lineTo(-size * 0.52, size * 0.3);
+                ctx.lineTo(size * 0.52, size * 0.3);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Inner glow
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, -size * 0.4);
+                ctx.lineTo(-size * 0.35, size * 0.2);
+                ctx.lineTo(size * 0.35, size * 0.2);
+                ctx.closePath();
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            
+            drawAirTriangle(x, y, size) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(this.rotation);
+                ctx.scale(this.scale, this.scale);
+                
+                // Reduced air glow for mobile
+                ctx.shadowBlur = isMobile ? 20 : 45;
+                ctx.shadowColor = 'rgba(255, 255, 0, 0.8)';
+                
+                // Air gradient
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                gradient.addColorStop(0.4, 'rgba(255, 255, 0, 0.9)');
+                gradient.addColorStop(0.7, 'rgba(138, 0, 139, 0.9)');
+                gradient.addColorStop(1, 'rgba(75, 0, 130, 0.9)');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 4;
+                
+                // Draw upward-pointing triangle (Air base)
+                ctx.beginPath();
+                ctx.moveTo(0, -size * 0.6);
+                ctx.lineTo(-size * 0.52, size * 0.3);
+                ctx.lineTo(size * 0.52, size * 0.3);
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Draw horizontal line through triangle (Air symbol)
+                ctx.beginPath();
+                ctx.moveTo(-size * 0.25, 0);
+                ctx.lineTo(size * 0.25, 0);
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            
+            drawPentagram(x, y, size) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(this.rotation);
+                ctx.scale(this.scale, this.scale);
+                
+                // Reduced glow effect for mobile
+                ctx.shadowBlur = isMobile ? 15 : 40;
+                ctx.shadowColor = 'rgba(255, 107, 53, 0.9)';
+                
+                // Gradient for fire effect
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                gradient.addColorStop(0, 'rgba(255, 255, 0, 0.9)');
+                gradient.addColorStop(0.5, 'rgba(255, 107, 53, 0.9)');
+                gradient.addColorStop(1, 'rgba(220, 20, 60, 0.9)');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+                    const px = Math.cos(angle) * size;
+                    const py = Math.sin(angle) * size;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(px, py);
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            drawMinimalistPath(centerX, centerY) {
+                ctx.save();
+                
+                const pathWidth = canvas.width * 0.7;
+                const pathHeight = 120;
+                const startX = centerX - pathWidth / 2;
+                
+                // Draw the dotted path line
+                ctx.strokeStyle = 'rgba(147, 0, 211, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 10]);
+                
+                ctx.beginPath();
+                for (let x = 0; x <= pathWidth; x += 2) {
+                    const progress = x / pathWidth;
+                    const y = this.getPathY(progress, centerY, pathHeight);
+                    
+                    if (x === 0) {
+                        ctx.moveTo(startX + x, y);
+                    } else {
+                        ctx.lineTo(startX + x, y);
+                    }
+                }
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                // Calculate traveler position
+                const travelerProgress = (this.trialsStateTimer / 3) % 1;
+                const travelerX = startX + (pathWidth * travelerProgress);
+                const travelerY = this.getPathY(travelerProgress, centerY, pathHeight);
+                
+                // Draw traveler trail
+                ctx.strokeStyle = 'rgba(147, 0, 211, 0.3)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                const trailLength = 50;
+                for (let i = 0; i <= trailLength; i++) {
+                    const trailProgress = Math.max(0, travelerProgress - (i / pathWidth) * 0.1);
+                    const trailX = startX + (pathWidth * trailProgress);
+                    const trailY = this.getPathY(trailProgress, centerY, pathHeight);
+                    
+                    if (i === 0) {
+                        ctx.moveTo(trailX, trailY);
+                    } else {
+                        ctx.lineTo(trailX, trailY);
+                    }
+                }
+                ctx.stroke();
+                
+                // Determine traveler state based on vertical position
+                const relativeY = travelerY - centerY;
+                const isHigh = relativeY < -40;
+                const isLow = relativeY > 40;
+                
+                // Draw traveler dot
+                ctx.shadowBlur = 25;
+                if (isHigh) {
+                    ctx.shadowColor = 'rgba(255, 215, 0, 1)';
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                } else if (isLow) {
+                    ctx.shadowColor = 'rgba(139, 0, 0, 1)';
+                    ctx.fillStyle = 'rgba(75, 0, 130, 0.9)';
+                } else {
+                    ctx.shadowColor = 'rgba(147, 0, 211, 1)';
+                    ctx.fillStyle = 'rgba(147, 0, 211, 0.9)';
+                }
+                
+                ctx.beginPath();
+                ctx.arc(travelerX, travelerY, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add pulse ring
+                const pulseSize = 15 + Math.sin(this.trialsStateTimer * 3) * 5;
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = ctx.fillStyle.replace('0.9', '0.3');
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(travelerX, travelerY, pulseSize, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Minimal markers
+                ctx.font = '11px Cinzel';
+                ctx.textAlign = 'center';
+                
+                ctx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+                ctx.fillText('↑', centerX - pathWidth/4, centerY - pathHeight - 20);
+                ctx.fillText('↑', centerX + pathWidth/4, centerY - pathHeight - 20);
+                
+                ctx.fillStyle = 'rgba(139, 0, 0, 0.3)';
+                ctx.fillText('↓', centerX, centerY + pathHeight + 30);
+                
+                ctx.restore();
+            }
+            
+            getPathY(progress, centerY, height) {
+                // Create a path with ups and downs
+                const wave1 = Math.sin(progress * Math.PI * 2) * height * 0.7;
+                const wave2 = Math.sin(progress * Math.PI * 4) * height * 0.3;
+                return centerY + wave1 + wave2;
+            }
+            
+            drawHexagram(x, y, size) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(this.rotation);
+                ctx.scale(this.scale, this.scale);
+                
+                // Reduced mystical glow for mobile
+                ctx.shadowBlur = isMobile ? 15 : 35;
+                ctx.shadowColor = 'rgba(255, 215, 0, 0.9)';
+                
+                // Create gradient for air element
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                gradient.addColorStop(0.5, 'rgba(255, 255, 0, 0.9)');
+                gradient.addColorStop(1, 'rgba(138, 0, 139, 0.9)');
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 3;
+                
+                // Draw two triangles
+                for (let tri = 0; tri < 2; tri++) {
+                    ctx.beginPath();
+                    for (let i = 0; i < 3; i++) {
+                        const angle = (i * 2 * Math.PI / 3) + (tri * Math.PI / 3) - Math.PI / 2;
+                        const px = Math.cos(angle) * size;
+                        const py = Math.sin(angle) * size;
+                        
+                        if (i === 0) {
+                            ctx.moveTo(px, py);
+                        } else {
+                            ctx.lineTo(px, py);
+                        }
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+
+            drawUnifiedSymbol(x, y) {
+                // Adjust scale for mobile but keep full symbol
+                const mobileScale = isMobile ? 0.6 : 0.8;
+                const unifiedRotation = this.rotation * 0.5;
+                
+                // Draw infinity as base layer
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(unifiedRotation);
+                ctx.scale(mobileScale, mobileScale);
+                
+                // Infinity with reduced glow
+                ctx.shadowBlur = isMobile ? 15 : 25;
+                ctx.shadowColor = 'rgba(147, 0, 211, 0.6)';
+                const infGradient = ctx.createLinearGradient(-150, 0, 150, 0);
+                infGradient.addColorStop(0, 'rgba(75, 0, 130, 0.4)');
+                infGradient.addColorStop(0.5, 'rgba(147, 0, 211, 0.4)');
+                infGradient.addColorStop(1, 'rgba(255, 215, 0, 0.4)');
+                
+                ctx.strokeStyle = infGradient;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                for (let t = 0; t <= Math.PI * 2; t += 0.01) {
+                    const px = 150 * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+                    const py = 150 * Math.sin(t) * Math.cos(t) / (1 + Math.sin(t) * Math.sin(t));
+                    if (t === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.stroke();
+                ctx.restore();
+                
+                // Monad circle
+                ctx.save();
+                ctx.shadowBlur = isMobile ? 15 : 30;
+                ctx.shadowColor = 'rgba(255, 215, 0, 0.8)';
+                const monadRadius = isMobile ? 100 : 120;
+                const monadGrad = ctx.createRadialGradient(x, y, 0, x, y, monadRadius);
+                monadGrad.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+                monadGrad.addColorStop(0.7, 'rgba(255, 215, 0, 0.5)');
+                monadGrad.addColorStop(1, 'rgba(255, 215, 0, 0.3)');
+                
+                ctx.strokeStyle = monadGrad;
+                ctx.lineWidth = isMobile ? 2 : 3;
+                ctx.beginPath();
+                ctx.arc(x, y, monadRadius * this.scale, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Central dot
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                ctx.beginPath();
+                ctx.arc(x, y, isMobile ? 5 : 8, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+                
+                // Pentagram inside
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(-unifiedRotation * 2);
+                ctx.scale(isMobile ? 0.5 : 0.6, isMobile ? 0.5 : 0.6);
+                ctx.shadowBlur = isMobile ? 10 : 20;
+                ctx.shadowColor = 'rgba(220, 20, 60, 0.6)';
+                
+                const pentGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 100);
+                pentGrad.addColorStop(0, 'rgba(255, 255, 0, 0.7)');
+                pentGrad.addColorStop(0.5, 'rgba(255, 107, 53, 0.7)');
+                pentGrad.addColorStop(1, 'rgba(220, 20, 60, 0.7)');
+                
+                ctx.strokeStyle = pentGrad;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+                    const px = Math.cos(angle) * 100;
+                    const py = Math.sin(angle) * 100;
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+                
+                // Hexagram overlay
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.rotate(unifiedRotation * 1.5);
+                ctx.scale(isMobile ? 0.6 : 0.7, isMobile ? 0.6 : 0.7);
+                ctx.shadowBlur = isMobile ? 12 : 25;
+                ctx.shadowColor = 'rgba(255, 255, 0, 0.5)';
+                
+                const hexGrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 100);
+                hexGrad.addColorStop(0, 'rgba(255, 255, 255, 0.5)');
+                hexGrad.addColorStop(0.5, 'rgba(255, 255, 0, 0.5)');
+                hexGrad.addColorStop(1, 'rgba(138, 0, 139, 0.5)');
+                
+                ctx.strokeStyle = hexGrad;
+                ctx.lineWidth = 2;
+                for (let tri = 0; tri < 2; tri++) {
+                    ctx.beginPath();
+                    for (let i = 0; i < 3; i++) {
+                        const angle = (i * 2 * Math.PI / 3) + (tri * Math.PI / 3) - Math.PI / 2;
+                        const px = Math.cos(angle) * 100;
+                        const py = Math.sin(angle) * 100;
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                }
+                ctx.restore();
+                
+                // Four elemental triangles at cardinal points
+                const elementalDistance = isMobile ? 150 : 200;
+                const elementalSize = isMobile ? 30 : 40;
+                
+                // Air (top) - Imagination
+                ctx.save();
+                ctx.translate(x, y - elementalDistance);
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(255, 255, 0, 0.8)';
+                ctx.strokeStyle = 'rgba(255, 255, 0, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, -elementalSize);
+                ctx.lineTo(-elementalSize * 0.866, elementalSize * 0.5);
+                ctx.lineTo(elementalSize * 0.866, elementalSize * 0.5);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(-elementalSize * 0.4, 0);
+                ctx.lineTo(elementalSize * 0.4, 0);
+                ctx.stroke();
+                ctx.restore();
+                
+                // Water (right) - Feeling
+                ctx.save();
+                ctx.translate(x + elementalDistance, y);
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(0, 0, 255, 0.8)';
+                ctx.strokeStyle = 'rgba(0, 0, 255, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, elementalSize);
+                ctx.lineTo(-elementalSize * 0.866, -elementalSize * 0.5);
+                ctx.lineTo(elementalSize * 0.866, -elementalSize * 0.5);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+                
+                // Earth (bottom) - Embodiment
+                ctx.save();
+                ctx.translate(x, y + elementalDistance);
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(128, 70, 27, 0.8)';
+                ctx.strokeStyle = 'rgba(128, 70, 27, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(-elementalSize, -elementalSize, elementalSize * 2, elementalSize * 2);
+                ctx.restore();
+                
+                // Fire (left) - Desire
+                ctx.save();
+                ctx.translate(x - elementalDistance, y);
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = 'rgba(220, 20, 60, 0.8)';
+                ctx.strokeStyle = 'rgba(220, 20, 60, 0.7)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, -elementalSize);
+                ctx.lineTo(-elementalSize * 0.866, elementalSize * 0.5);
+                ctx.lineTo(elementalSize * 0.866, elementalSize * 0.5);
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            draw() {
+                const section = Math.floor(window.scrollY / window.innerHeight);
+                const centerX = canvas.width / 2 / dpr;
+                const centerY = canvas.height / 2 / dpr;
+                
+                // Adjust size for mobile but keep all symbols
+                const sizeMultiplier = isMobile ? 0.7 : 1;
+                
+                switch(section) {
+                    case 0:
+                        // Title page - The Magician with unified symbol
+                        this.drawUnifiedSymbol(centerX, centerY);
+                        break;
+                    case 1:
+                        this.drawInfinity(centerX, centerY, 200 * sizeMultiplier);
+                        break;
+                    case 2:
+                        // Monad circle with reduced glow for mobile
+                        ctx.save();
+                        ctx.shadowBlur = isMobile ? 20 : 50;
+                        ctx.shadowColor = 'rgba(255, 215, 0, 1)';
+                        
+                        const monadSize = 150 * sizeMultiplier;
+                        const monadGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, monadSize);
+                        monadGradient.addColorStop(0, 'rgba(255, 255, 255, 0.9)');
+                        monadGradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.8)');
+                        monadGradient.addColorStop(1, 'rgba(255, 215, 0, 0.6)');
+                        
+                        ctx.strokeStyle = monadGradient;
+                        ctx.lineWidth = isMobile ? 3 : 5;
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, monadSize * this.scale, 0, Math.PI * 2);
+                        ctx.stroke();
+                        
+                        // Inner dot
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, (10 * sizeMultiplier) * this.scale, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.restore();
+                        break;
+                    case 3:
+                        // Fire triangle for Desire
+                        this.drawFireTriangle(centerX, centerY, 180 * sizeMultiplier);
+                        break;
+                    case 4:
+                        // Air triangle for Imagination  
+                        this.drawAirTriangle(centerX, centerY, 180 * sizeMultiplier);
+                        break;
+                    case 5:
+                        this.drawHexagram(centerX, centerY, 150 * sizeMultiplier);
+                        break;
+                    case 6:
+                        // Water triangle with reduced flow effect for mobile
+                        ctx.save();
+                        ctx.translate(centerX, centerY);
+                        ctx.rotate(this.rotation);
+                        ctx.scale(this.scale * sizeMultiplier, this.scale * sizeMultiplier);
+                        
+                        ctx.shadowBlur = isMobile ? 15 : 40;
+                        ctx.shadowColor = 'rgba(0, 100, 255, 0.9)';
+                        
+                        const waterGradient = ctx.createLinearGradient(0, -60, 0, 120);
+                        waterGradient.addColorStop(0, 'rgba(70, 130, 180, 0.9)');
+                        waterGradient.addColorStop(0.5, 'rgba(0, 0, 255, 0.9)');
+                        waterGradient.addColorStop(1, 'rgba(46, 139, 87, 0.9)');
+                        
+                        ctx.strokeStyle = waterGradient;
+                        ctx.lineWidth = isMobile ? 3 : 4;
+                        ctx.beginPath();
+                        ctx.moveTo(0, 120);
+                        ctx.lineTo(-100, -60);
+                        ctx.lineTo(100, -60);
+                        ctx.closePath();
+                        ctx.stroke();
+                        ctx.restore();
+                        break;
+                    case 7:
+                        // Draw the minimalist path journey
+                        this.drawMinimalistPath(centerX, centerY);
+                        break;
+                    case 8:
+                        // Earth square with reduced crystalline effect for mobile
+                        ctx.save();
+                        ctx.translate(centerX, centerY);
+                        ctx.rotate(this.rotation);
+                        ctx.scale(this.scale * sizeMultiplier, this.scale * sizeMultiplier);
+                        
+                        ctx.shadowBlur = isMobile ? 15 : 30;
+                        ctx.shadowColor = 'rgba(228, 208, 10, 0.9)';
+                        
+                        const earthGradient = ctx.createLinearGradient(-100, -100, 100, 100);
+                        earthGradient.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
+                        earthGradient.addColorStop(0.3, 'rgba(128, 70, 27, 0.9)');
+                        earthGradient.addColorStop(0.6, 'rgba(128, 128, 0, 0.9)');
+                        earthGradient.addColorStop(1, 'rgba(228, 208, 10, 0.9)');
+                        
+                        ctx.strokeStyle = earthGradient;
+                        ctx.lineWidth = isMobile ? 3 : 5;
+                        ctx.strokeRect(-100, -100, 200, 200);
+                        
+                        // Inner square
+                        ctx.lineWidth = isMobile ? 2 : 2;
+                        ctx.strokeRect(-50, -50, 100, 100);
+                        ctx.restore();
+                        break;
+                    case 9:
+                        this.drawInfinity(centerX, centerY, 220 * sizeMultiplier);
+                        this.drawHexagram(centerX, centerY, 120 * sizeMultiplier);
+                        break;
+                }
+            }
+        }
+
+        // Initialize particles and geometry based on device
+        const particles = [];
+        for (let i = 0; i < config.particleCount; i++) {
+            particles.push(new Particle());
+        }
+        const geometry = new SacredGeometry();
+
+        // Optimized animation loop with FPS control
+        let lastTime = 0;
+        const targetFPS = config.fps;
+        const frameTime = 1000 / targetFPS;
+        let animationId;
+        
+        function animate(currentTime) {
+            if (prefersReducedMotion) {
+                return; // Stop animation for reduced motion preference
+            }
+            
+            const deltaTime = currentTime - lastTime;
+            
+            if (deltaTime >= frameTime) {
+                // Clear with fade effect
+                ctx.fillStyle = isMobile ? 'rgba(0, 0, 5, 0.08)' : 'rgba(0, 0, 5, 0.05)';
+                ctx.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+                
+                // Update and draw particles
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+                
+                // Always draw geometry but with optimizations for mobile
+                geometry.update();
+                geometry.draw();
+                
+                lastTime = currentTime;
+            }
+            
+            animationId = requestAnimationFrame(animate);
+        }
+        
+        // Start animation if not reduced motion
+        if (!prefersReducedMotion) {
+            animate(0);
+        }
+        
+        // Pause animation when page is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                cancelAnimationFrame(animationId);
+            } else if (!prefersReducedMotion) {
+                animate(0);
+            }
+        });
+
+        // Intersection Observer for sections
+        const sections = document.querySelectorAll('.section');
+        const navDots = document.querySelectorAll('.nav-dot');
+        
+        const observerOptions = {
+            threshold: 0.5
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Remove active from all sections
+                    sections.forEach(s => s.classList.remove('active'));
+                    // Add active to current section
+                    entry.target.classList.add('active');
+                    
+                    // Update nav dots
+                    const sectionIndex = Array.from(sections).indexOf(entry.target);
+                    navDots.forEach((dot, index) => {
+                        dot.classList.toggle('active', index === sectionIndex);
+                    });
+                    
+                    // Hide scroll indicator after first section
+                    const scrollIndicator = document.querySelector('.scroll-indicator');
+                    if (sectionIndex > 0) {
+                        scrollIndicator.classList.add('hidden');
+                    } else {
+                        scrollIndicator.classList.remove('hidden');
+                    }
+                }
+            });
+        }, observerOptions);
+        
+        sections.forEach(section => observer.observe(section));
+
+        // Navigation dot clicks
+        navDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                sections[index].scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            const currentSection = document.querySelector('.section.active');
+            const currentIndex = Array.from(sections).indexOf(currentSection);
+            
+            if (e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+                e.preventDefault();
+                if (currentIndex < sections.length - 1) {
+                    sections[currentIndex + 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    sections[currentIndex - 1].scrollIntoView({ behavior: 'smooth' });
+                }
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                sections[0].scrollIntoView({ behavior: 'smooth' });
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                sections[sections.length - 1].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Instagram-like touch handling for mobile
+        let touchStartY = 0;
+        let touchStartX = 0;
+        let touchEndY = 0;
+        let touchEndX = 0;
+        let touchStartTime = 0;
+        let isScrolling = false;
+        let scrollVelocity = 0;
+        
+        // Track scroll momentum
+        let lastScrollY = 0;
+        let scrollTimeout;
+        
+        if (isMobile) {
+            // Smooth scroll with momentum tracking
+            let ticking = false;
+            function updateScrollPosition() {
+                const currentScrollY = window.scrollY;
+                scrollVelocity = currentScrollY - lastScrollY;
+                lastScrollY = currentScrollY;
+                ticking = false;
+            }
+            
+            window.addEventListener('scroll', () => {
+                if (!ticking) {
+                    requestAnimationFrame(updateScrollPosition);
+                    ticking = true;
+                }
+                
+                // Clear existing timeout
+                clearTimeout(scrollTimeout);
+                isScrolling = true;
+                
+                // Set scrolling to false after scroll ends
+                scrollTimeout = setTimeout(() => {
+                    isScrolling = false;
+                    scrollVelocity = 0;
+                }, 150);
+            }, { passive: true });
+            
+            // Simplified touch handling - let CSS scroll-snap do the work
+            document.addEventListener('touchstart', (e) => {
+                touchStartY = e.changedTouches[0].screenY;
+                touchStartX = e.changedTouches[0].screenX;
+                touchStartTime = Date.now();
+            }, { passive: true });
+            
+            document.addEventListener('touchmove', (e) => {
+                // Allow natural scrolling
+            }, { passive: true });
+            
+            document.addEventListener('touchend', (e) => {
+                touchEndY = e.changedTouches[0].screenY;
+                touchEndX = e.changedTouches[0].screenX;
+                
+                // Quick flick detection for faster navigation
+                const swipeTime = Date.now() - touchStartTime;
+                const verticalDistance = touchStartY - touchEndY;
+                const horizontalDistance = Math.abs(touchStartX - touchEndX);
+                
+                // Only handle very quick flicks
+                if (swipeTime < 200 && Math.abs(verticalDistance) > 50 && horizontalDistance < 50) {
+                    const currentSection = document.querySelector('.section.active');
+                    const currentIndex = Array.from(sections).indexOf(currentSection);
+                    
+                    if (verticalDistance > 0 && currentIndex < sections.length - 1) {
+                        // Quick flick up
+                        sections[currentIndex + 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else if (verticalDistance < 0 && currentIndex > 0) {
+                        // Quick flick down
+                        sections[currentIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }
+            }, { passive: true });
+        }
+        
+        // Add swipe hint for mobile users
+        if (isMobile) {
+            const scrollIndicator = document.querySelector('.scroll-indicator');
+            if (scrollIndicator) {
+                const hint = document.createElement('div');
+                hint.style.cssText = 'font-size: 12px; opacity: 0.7; margin-top: 5px;';
+                hint.textContent = 'Swipe to navigate';
+                scrollIndicator.appendChild(hint);
+            }
+        }
+
+        // Localization System
+        let translations = {};
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        // Load translations from JSON file
+        async function loadTranslations() {
+            try {
+                const response = await fetch('translations_polished.json');
+                translations = await response.json();
+                applyTranslations();
+                updateNavigationDots();
+            } catch (error) {
+                console.error('Error loading translations:', error);
+                // Fallback to English if loading fails
+                currentLanguage = 'en';
+            }
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'cz' : 'en';
+            localStorage.setItem('language', currentLanguage);
+            applyTranslations();
+            updateNavigationDots();
+        }
+
+        function applyTranslations() {
+            if (!translations[currentLanguage]) return;
+            
+            // Update simple text elements
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                const keys = key.split('.');
+                let value = translations[currentLanguage];
+                
+                // Handle nested keys
+                for (const k of keys) {
+                    if (k.includes('Title')) {
+                        const sectionKey = k.replace('Title', '');
+                        value = value[sectionKey]?.title;
+                    } else if (k.includes('Subtitle')) {
+                        const sectionKey = k.replace('Subtitle', '');
+                        value = value[sectionKey]?.subtitle;
+                    } else if (k.includes('Description')) {
+                        const sectionKey = k.replace('Description', '');
+                        value = value[sectionKey]?.description;
+                    } else if (k.includes('Principle')) {
+                        const match = k.match(/section(\d+)Principle(\d+)/);
+                        if (match) {
+                            const sectionKey = 'section' + match[1];
+                            const principleIndex = parseInt(match[2]) - 1;
+                            value = value[sectionKey]?.principles?.[principleIndex];
+                        }
+                    } else {
+                        value = value[k];
+                    }
+                    if (!value) break;
+                }
+                
+                if (value) {
+                    element.textContent = value;
+                }
+            });
+            
+            // Update page title
+            const titleElement = document.querySelector('title[data-i18n]');
+            if (titleElement && translations[currentLanguage].pageTitle) {
+                titleElement.textContent = translations[currentLanguage].pageTitle;
+            }
+            
+            // Update language button
+            document.getElementById('langButton').textContent = currentLanguage.toUpperCase();
+            
+            // Update HTML lang attribute
+            document.documentElement.lang = currentLanguage === 'cz' ? 'cs' : 'en';
+        }
+
+        function updateNavigationDots() {
+            if (!translations[currentLanguage]) return;
+            
+            const navDots = document.querySelectorAll('.nav-dot');
+            const navTranslations = translations[currentLanguage].navDots;
+            
+            if (navTranslations) {
+                const navKeys = ['theMagician', 'infinity', 'senseOfSelf', 'desire', 'imagination', 
+                                 'soulAlignment', 'feeling', 'trials', 'embodiment', 'newStart'];
+                
+                navDots.forEach((dot, index) => {
+                    if (navKeys[index] && navTranslations[navKeys[index]]) {
+                        dot.setAttribute('data-title', navTranslations[navKeys[index]]);
+                    }
+                });
+            }
+        }
+
+        // Initialize translations on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTranslations();
+        });
+    </script>
+</body>
+</html>

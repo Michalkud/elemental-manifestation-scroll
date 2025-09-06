@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trials Visualization - Option 2: Pulsing Pentagram</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: #000005;
+            color: #e8e3d3;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            max-width: 800px;
+            padding: 60px 40px;
+            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            z-index: 10;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.8rem;
+            font-style: italic;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .description {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .state-indicator {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Cinzel', serif;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            opacity: 0.7;
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <canvas id="canvas"></canvas>
+        <div class="content">
+            <h1>Trials</h1>
+            <p class="subtitle">The Inner Flame</p>
+            <p class="description">
+                The pentagram remains steady at your center. Its colors pulse between light and shadow, 
+                reflecting the trials you face while your core remains unshaken.
+            </p>
+        </div>
+        <div class="state-indicator" id="stateText">ASCENDING</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const stateText = document.getElementById('stateText');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class PentagramVisualization {
+            constructor() {
+                this.time = 0;
+                this.breathPhase = 0;
+                this.colorPhase = 0;
+                this.ringPhase = 0;
+                this.currentState = 'light';
+            }
+
+            update() {
+                this.time += 0.01;
+                this.breathPhase += 0.015;
+                this.colorPhase += 0.008;
+                this.ringPhase += 0.02;
+                
+                // Smoothly transition between states
+                const cycle = Math.sin(this.colorPhase);
+                this.currentState = cycle > 0 ? 'light' : 'dark';
+                
+                // Update state text
+                if (this.currentState === 'light') {
+                    stateText.textContent = 'ASCENDING';
+                    stateText.style.color = 'rgba(255, 215, 0, 0.8)';
+                } else {
+                    stateText.textContent = 'DESCENDING';
+                    stateText.style.color = 'rgba(139, 0, 0, 0.8)';
+                }
+            }
+
+            draw() {
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const baseSize = 180;
+                
+                // Clear canvas
+                ctx.fillStyle = 'rgba(0, 0, 5, 0.15)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Calculate smooth transition value (0 to 1)
+                const transitionValue = (Math.sin(this.colorPhase) + 1) / 2;
+                
+                // Draw expanding rings
+                this.drawRings(centerX, centerY, transitionValue);
+                
+                // Draw pentagram with smooth color transition
+                this.drawPentagram(centerX, centerY, baseSize, transitionValue);
+                
+                // Draw energy particles
+                this.drawEnergyParticles(centerX, centerY, baseSize, transitionValue);
+            }
+
+            drawRings(x, y, transition) {
+                const ringRadius = 250 + Math.sin(this.ringPhase) * 20;
+                const ringOpacity = 0.2 * (1 - (Math.sin(this.ringPhase) + 1) / 4);
+                
+                ctx.save();
+                
+                // Interpolate colors for rings
+                const r = Math.floor(139 + (255 - 139) * transition);
+                const g = Math.floor(0 + (215 - 0) * transition);
+                const b = Math.floor(0 + (0 - 0) * transition);
+                
+                ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${ringOpacity})`;
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = `rgba(${r}, ${g}, ${b}, 0.5)`;
+                
+                // Draw multiple rings
+                for (let i = 0; i < 3; i++) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, ringRadius + i * 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            }
+
+            drawPentagram(x, y, size, transition) {
+                ctx.save();
+                ctx.translate(x, y);
+                
+                // Breathing effect
+                const breathScale = 1 + Math.sin(this.breathPhase) * 0.08;
+                ctx.scale(breathScale, breathScale);
+                
+                // Smooth color interpolation
+                const lightColors = {
+                    r1: 255, g1: 255, b1: 255,  // White
+                    r2: 255, g2: 215, b2: 0,     // Gold
+                    r3: 255, g3: 140, b3: 0      // Orange
+                };
+                
+                const darkColors = {
+                    r1: 139, g1: 0, b1: 0,       // Dark red
+                    r2: 75, g2: 0, b2: 130,      // Indigo
+                    r3: 0, g3: 0, b3: 0          // Black
+                };
+                
+                // Interpolate between color sets
+                const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+                gradient.addColorStop(0, `rgba(${
+                    Math.floor(darkColors.r1 + (lightColors.r1 - darkColors.r1) * transition)
+                }, ${
+                    Math.floor(darkColors.g1 + (lightColors.g1 - darkColors.g1) * transition)
+                }, ${
+                    Math.floor(darkColors.b1 + (lightColors.b1 - darkColors.b1) * transition)
+                }, 0.9)`);
+                gradient.addColorStop(0.5, `rgba(${
+                    Math.floor(darkColors.r2 + (lightColors.r2 - darkColors.r2) * transition)
+                }, ${
+                    Math.floor(darkColors.g2 + (lightColors.g2 - darkColors.g2) * transition)
+                }, ${
+                    Math.floor(darkColors.b2 + (lightColors.b2 - darkColors.b2) * transition)
+                }, 0.9)`);
+                gradient.addColorStop(1, `rgba(${
+                    Math.floor(darkColors.r3 + (lightColors.r3 - darkColors.r3) * transition)
+                }, ${
+                    Math.floor(darkColors.g3 + (lightColors.g3 - darkColors.g3) * transition)
+                }, ${
+                    Math.floor(darkColors.b3 + (lightColors.b3 - darkColors.b3) * transition)
+                }, 0.9)`);
+                
+                // Set shadow based on state
+                ctx.shadowBlur = 40 + Math.sin(this.breathPhase) * 10;
+                if (transition > 0.5) {
+                    ctx.shadowColor = `rgba(255, 215, 0, ${0.8 * transition})`;
+                } else {
+                    ctx.shadowColor = `rgba(139, 0, 0, ${0.8 * (1 - transition)})`;
+                }
+                
+                ctx.strokeStyle = gradient;
+                ctx.lineWidth = 4;
+                
+                // Draw pentagram
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 4 * Math.PI / 5) - Math.PI / 2;
+                    const px = Math.cos(angle) * size;
+                    const py = Math.sin(angle) * size;
+                    
+                    if (i === 0) {
+                        ctx.moveTo(px, py);
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.closePath();
+                ctx.stroke();
+                
+                // Draw inner pentagon
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = `rgba(147, 0, 211, ${0.3 + transition * 0.3})`;
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+                    const px = Math.cos(angle) * (size * 0.38);
+                    const py = Math.sin(angle) * (size * 0.38);
+                    
+                    if (i === 0) {
+                        ctx.moveTo(px, py);
+                    } else {
+                        ctx.lineTo(px, py);
+                    }
+                }
+                ctx.closePath();
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+
+            drawEnergyParticles(centerX, centerY, radius, transition) {
+                const particleCount = 5;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (this.time * 0.5 + i * Math.PI * 2 / particleCount);
+                    const distance = radius * 1.5 + Math.sin(this.time * 2 + i) * 30;
+                    const x = centerX + Math.cos(angle) * distance;
+                    const y = centerY + Math.sin(angle) * distance;
+                    
+                    ctx.save();
+                    
+                    // Particle color based on transition
+                    const r = Math.floor(139 + (255 - 139) * transition);
+                    const g = Math.floor(0 + (215 - 0) * transition);
+                    const b = Math.floor(0 + (0 - 0) * transition);
+                    
+                    const particleGradient = ctx.createRadialGradient(x, y, 0, x, y, 10);
+                    particleGradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.8)`);
+                    particleGradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
+                    
+                    ctx.fillStyle = particleGradient;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.restore();
+                }
+            }
+        }
+
+        const pentagram = new PentagramVisualization();
+
+        function animate() {
+            pentagram.update();
+            pentagram.draw();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
