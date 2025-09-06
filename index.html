@@ -238,20 +238,20 @@
         #section-2 .principles li::before { content: '△'; color: var(--air-yellow); }
 
         #section-3 h1 {
-            background: linear-gradient(135deg, #ff1493, #00fa9a, var(--gold), #9400d3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        #section-3 .principles li::before { content: '✡'; color: var(--gold); }
-
-        #section-4 h1 {
             background: linear-gradient(135deg, #4682b4, var(--water-blue), #2e8b57, #c0c0c0);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-        #section-4 .principles li::before { content: '▽'; color: var(--water-blue); }
+        #section-3 .principles li::before { content: '▽'; color: var(--water-blue); }
+
+        #section-4 h1 {
+            background: linear-gradient(135deg, #ff1493, #00fa9a, var(--gold), #9400d3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        #section-4 .principles li::before { content: '✡'; color: var(--gold); }
 
         #section-5 h1 {
             background: linear-gradient(135deg, var(--fire-red), var(--water-blue), var(--air-yellow), var(--earth-brown), var(--spirit-violet));
@@ -600,8 +600,8 @@
         <div class="nav-dot" data-title="Sense of Self" data-title-cz="Smysl Já" data-section="2"></div>
         <div class="nav-dot" data-title="Desire" data-title-cz="Touha" data-section="3"></div>
         <div class="nav-dot" data-title="Imagination" data-title-cz="Představivost" data-section="4"></div>
-        <div class="nav-dot" data-title="Soul-Alignment" data-title-cz="Soulad Duše" data-section="5"></div>
-        <div class="nav-dot" data-title="Feeling" data-title-cz="Pocit" data-section="6"></div>
+        <div class="nav-dot" data-title="Feeling" data-title-cz="Pocit" data-section="5"></div>
+        <div class="nav-dot" data-title="Soul-Alignment" data-title-cz="Soulad Duše" data-section="6"></div>
         <div class="nav-dot" data-title="Trials" data-title-cz="Zkoušky" data-section="7"></div>
         <div class="nav-dot" data-title="Embodiment" data-title-cz="Ztělesnění" data-section="8"></div>
         <div class="nav-dot" data-title="New Start" data-title-cz="Nový Začátek" data-section="9"></div>
@@ -691,27 +691,10 @@
         </div>
     </section>
 
-    <!-- Section 3: Soul-Alignment -->
+    <!-- Section 3: Feeling -->
     <section id="section-3" class="section">
         <div class="section-content">
             <div class="slide-number">3.</div>
-            <h1 data-i18n="section3Title">Soul-Alignment</h1>
-            <p class="subtitle" data-i18n="section3Subtitle">Ethics of Intention</p>
-            <p class="description" data-i18n="section3Description">
-                Your imagination should always be in harmony with your soul, otherwise you'll reach a desire that wasn't truly yours. When imagining, we should always think only of fulfillment that harms no one. This isn't a command to the universe; you can call in bad things too, but you'll always pay for it.
-            </p>
-            <ul class="principles">
-                <li data-i18n="section3Principle1">True desires resonate with the soul's authentic frequency</li>
-                <li data-i18n="section3Principle2">Ethical intention creates harmony in manifestation</li>
-                <li data-i18n="section3Principle3">What harms none flows freely through creation</li>
-            </ul>
-        </div>
-    </section>
-
-    <!-- Section 4: Feeling -->
-    <section id="section-4" class="section">
-        <div class="section-content">
-            <div class="slide-number">4.</div>
             <h1 data-i18n="section4Title">The Feeling</h1>
             <p class="subtitle" data-i18n="section4Subtitle">"It Already Happened"</p>
             <p class="description" data-i18n="section4Description">
@@ -721,6 +704,23 @@
                 <li data-i18n="section4Principle1">Feel the completion before the form appears</li>
                 <li data-i18n="section4Principle2">Water always finds its true level—let feeling flow naturally</li>
                 <li data-i18n="section4Principle3">Live from the end, not toward it</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 4: Soul-Alignment -->
+    <section id="section-4" class="section">
+        <div class="section-content">
+            <div class="slide-number">4.</div>
+            <h1 data-i18n="section3Title">Soul-Alignment</h1>
+            <p class="subtitle" data-i18n="section3Subtitle">Ethics of Intention</p>
+            <p class="description" data-i18n="section3Description">
+                Your imagination should always be in harmony with your soul, otherwise you'll reach a desire that wasn't truly yours. When imagining, we should always think only of fulfillment that harms no one. This isn't a command to the universe; you can call in bad things too, but you'll always pay for it.
+            </p>
+            <ul class="principles">
+                <li data-i18n="section3Principle1">True desires resonate with the soul's authentic frequency</li>
+                <li data-i18n="section3Principle2">Ethical intention creates harmony in manifestation</li>
+                <li data-i18n="section3Principle3">What harms none flows freely through creation</li>
             </ul>
         </div>
     </section>
@@ -1411,10 +1411,7 @@
                         this.drawAirTriangle(centerX, centerY, 180 * sizeMultiplier);
                         break;
                     case 5:
-                        this.drawHexagram(centerX, centerY, 150 * sizeMultiplier);
-                        break;
-                    case 6:
-                        // Water triangle with reduced flow effect for mobile
+                        // Water triangle for Feeling (moved from case 6)
                         ctx.save();
                         ctx.translate(centerX, centerY);
                         ctx.rotate(this.rotation);
@@ -1437,6 +1434,10 @@
                         ctx.closePath();
                         ctx.stroke();
                         ctx.restore();
+                        break;
+                    case 6:
+                        // Hexagram for Soul-Alignment (moved from case 5)
+                        this.drawHexagram(centerX, centerY, 150 * sizeMultiplier);
                         break;
                     case 7:
                         // Draw the minimalist path journey
@@ -1768,7 +1769,7 @@
             
             if (navTranslations) {
                 const navKeys = ['theMagician', 'infinity', 'senseOfSelf', 'desire', 'imagination', 
-                                 'soulAlignment', 'feeling', 'trials', 'embodiment', 'newStart'];
+                                 'feeling', 'soulAlignment', 'trials', 'embodiment', 'newStart'];
                 
                 navDots.forEach((dot, index) => {
                     if (navKeys[index] && navTranslations[navKeys[index]]) {
